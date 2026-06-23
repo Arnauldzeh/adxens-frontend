@@ -14,10 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        <div className="flex min-h-screen bg-gray-50">
+      <body className="antialiased overflow-hidden">
+        <div className="flex h-screen bg-gray-50">
           <Sidebar />
-          <main className="flex-1">
+          <main className="flex-1 flex flex-col overflow-hidden">
             {children}
           </main>
         </div>

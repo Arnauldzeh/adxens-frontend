@@ -20,9 +20,10 @@ export function Sidebar() {
       label: 'Home' 
     },
     { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M11 5.882a5.008 5.008 0 014.288 4.118L18 10v3l-2.712.5a5.008 5.008 0 01-4.288 4.118" /></svg>,
       label: 'Ad accounts', 
-      badge: 2 
+      badge: 2,
+      hasSubmenu: true
     },
     { 
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
@@ -35,7 +36,7 @@ export function Sidebar() {
       hasSubmenu: true 
     },
     { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>,
       label: 'Affiliate program' 
     }
   ];
@@ -45,23 +46,23 @@ export function Sidebar() {
       <div className="p-4">
         {/* Logo */}
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.5 2L5.5 22M5.5 2L18.5 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span className="text-lg font-semibold">adxens</span>
+          <svg className="w-7 h-7 text-black" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.5 12c1.8-1.2 4-3.5 4-5.5 0-1.8-1.2-3-3-3-1.8 0-3.5 1.8-5 4-1.5-2.2-3.2-4-5-4-1.8 0-3 1.2-3 3 0 2 2.2 4.3 4 5.5-1.8 1.2-4 3.5-4 5.5 0 1.8 1.2 3 3 3 1.8 0 3.5-1.8 5-4 1.5 2.2 3.2 4 5 4 1.8 0 3-1.2 3-3 0-2-2.2-4.3-4-5.5z" />
+          </svg>
+          <span className="text-xl font-bold tracking-tight text-gray-900">adxens</span>
         </div>
 
         {/* Workspace Selector */}
         <div className="mb-6">
-          <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-black rounded"></div>
-              <span className="text-sm font-medium">Workspace name</span>
+              <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full border-2 border-white"></div>
+              </div>
+              <span className="text-sm font-semibold text-gray-900">Workspace name</span>
             </div>
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
             </svg>
           </button>
         </div>
@@ -73,7 +74,7 @@ export function Sidebar() {
             placeholder="Search"
             className="w-full pl-3 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          <kbd className="absolute right-3 top-2 text-xs text-gray-400 font-mono bg-white border border-gray-200 rounded px-1.5 py-0.5">
+          <kbd className="absolute right-3 top-2.5 text-xs text-gray-400 font-mono bg-white border border-gray-200 rounded px-1.5 py-0.5">
             /
           </kbd>
         </div>
@@ -83,7 +84,7 @@ export function Sidebar() {
           {items.map((item, index) => (
             <button
               key={index}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
                 item.active
                   ? 'bg-gray-100 text-gray-900 font-medium'
                   : 'text-gray-700 hover:bg-gray-50'
@@ -93,16 +94,18 @@ export function Sidebar() {
                 <span className="text-gray-500">{item.icon}</span>
                 <span>{item.label}</span>
               </div>
-              {item.badge && (
-                <span className="bg-blue-600 text-white text-xs font-medium rounded-full px-2 py-0.5 min-w-[20px] text-center">
-                  {item.badge}
-                </span>
-              )}
-              {item.hasSubmenu && (
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              )}
+              <div className="flex items-center gap-2">
+                {item.badge && (
+                  <span className="bg-blue-600 text-white text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                    {item.badge}
+                  </span>
+                )}
+                {item.hasSubmenu && (
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+              </div>
             </button>
           ))}
         </nav>
