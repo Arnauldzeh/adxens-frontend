@@ -1,32 +1,71 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Avatar } from '@/components/ui/Avatar';
 import { Switch } from '@/components/ui/Switch';
+import { Navbar } from '@/components/settings/Navbar';
+import { Sidebar } from '@/components/settings/Sidebar';
+import { HeaderSections } from '@/components/settings/HeaderSections';
+import {
+  Building2,
+  Check,
+  ChevronDown,
+  CreditCard,
+  FileBadge,
+  Upload,
+  Users,
+} from 'lucide-react';
 
 export default function SettingsPage() {
+  // Sidebar mobile state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('General settings');
+
+  // Original saved data
   const [initialData, setInitialData] = useState({
     firstName: 'Simon',
     lastName: 'Alt',
     phoneNumber: '695 840 8714',
     country: 'Cameroon',
     language: 'English',
-    timezone: 'GMT+1'
+    timezone: 'UTC-08:00 Pacific Time, US & Canada'
   });
 
+  // Current editing data
   const [formData, setFormData] = useState({ ...initialData });
 
+  // Notifications channels state
   const [notifications, setNotifications] = useState({
     email: true,
-    push: true,
-    sms: false
+    sms: true,
+    push: true
   });
 
-  const isDirty = Object.keys(formData).some(
+  // Accordion active switches
+  const [accordionSwitches, setAccordionSwitches] = useState({
+    0: true,  // Security alerts (ON)
+    1: false, // Billing (OFF)
+    2: false, // Marketing (OFF)
+    3: false  // Advanced settings (OFF)
+  });
+
+  // Sub-notifications inside expanded Security Alerts accordion
+  const [subNotifications, setSubNotifications] = useState({
+    newsAndUpdates: true,
+    secureAlerts: false,
+    newDeviceLogin: true,
+    billingAndInvoice: false
+  });
+
+  // Expanded accordion state (0: Security alerts, 1: Billing, 2: Marketing, 3: Advanced, null: none)
+  const [openAccordion, setOpenAccordion] = useState<number | null>(0);
+
+  // Check if form data has been modified compared to initialData
+  const isFormDirty = Object.keys(formData).some(
     (key) => formData[key as keyof typeof formData] !== initialData[key as keyof typeof initialData]
   );
+
+  // Check if notifications or sub-notifications have changed from original default values (optional, let's keep it simple: form dirty triggers banner)
+  const isDirty = isFormDirty;
 
   const handleCancel = () => {
     setFormData({ ...initialData });
@@ -36,332 +75,906 @@ export default function SettingsPage() {
     setInitialData({ ...formData });
   };
 
-  return (
-    <>
-      {/* Header - Fixed */}
-      <header className="bg-white border-b border-gray-200 px-8 py-4 flex-shrink-0">
-        {/* Row 1: Title and Header Actions */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Balance Pill */}
-            <button className="flex items-center justify-between h-[42px] w-[140px] pl-[15px] pr-[6px] py-[6px] gap-[10px] bg-[#F4F4F4] text-gray-900 border border-black/[0.07] rounded-[28px] text-sm font-semibold hover:bg-gray-200/80 transition-colors cursor-pointer">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-              <span>$1 200</span>
-              <svg className="w-4 h-4 text-gray-500 hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            </button>
-            
-            {/* Help Pill */}
-            <button className="flex items-center h-[38px] px-[12px] py-[6px] gap-[10px] bg-[#F4F4F4] text-gray-900 border border-black/[0.07] rounded-[28px] text-sm font-semibold hover:bg-gray-200/80 transition-colors cursor-pointer" title="Help">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Help</span>
-            </button>
-            
-            {/* Notifications Bell */}
-            <button className="w-[42px] h-[42px] flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors cursor-pointer" title="Notifications">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
+  const toggleAccordion = (index: number) => {
+    setOpenAccordion(openAccordion === index ? null : index);
+  };
 
-            {/* Profile Dropdown with verified badge and up/down chevron */}
-            <button className="flex items-center h-[42px] gap-2 pl-3 border-l border-gray-200 hover:bg-gray-50 rounded-lg px-2 transition-colors cursor-pointer">
-              <div className="relative">
-                <Avatar src="/avatar.png" alt="Simon Alt" size="sm" fallback="SA" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-blue-600 text-white rounded-full flex items-center justify-center border border-white">
-                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+  return (
+    <div className="relative w-full min-h-screen bg-[#EFEFEF] lg:bg-white">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      {/* Navigation Bar */}
+      <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+
+      {/* Main Container - Responsive */}
+      <div className="
+        relative lg:absolute
+        w-full lg:w-auto
+        min-h-screen
+        lg:min-h-0 lg:h-[calc(100vh-8px)]
+        left-0 lg:left-[236px] lg:right-0
+        top-0 lg:top-[8px]
+        mt-[63px] lg:mt-0
+        bg-white
+        lg:border lg:border-[rgba(39,39,42,0.1)]
+        lg:rounded-tl-[16px]
+        px-4 sm:px-6 lg:px-0
+        lg:overflow-hidden
+      ">
+        {/* Header sections: Description & Underline Tabs */}
+        <HeaderSections activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Main content stack container - Frame 1000005262 */}
+        <div className={`
+          relative lg:absolute
+          w-full lg:w-[842px]
+          min-h-[1550px] lg:min-h-0 lg:h-[calc(100vh-192px)]
+          left-0 lg:left-[21px]
+          top-0 lg:top-[174px]
+          flex flex-col 
+          items-start
+          p-0
+          gap-[10px]
+          py-6 lg:py-0
+          pb-16 lg:pb-0
+          lg:overflow-y-auto
+          lg:overflow-x-hidden
+          lg:scrollbar-hide
+          ${activeTab === 'General settings' ? '' : 'hidden'}
+        `}>
+        
+        {/* Personal Information Card */}
+        <section className="
+          w-full lg:w-[842px]
+          min-h-[294px] lg:h-[294px]
+          bg-[#FAFAFA]
+          rounded-[16px]
+          p-[10px]
+          gap-[15px]
+          flex flex-col lg:flex-row
+          justify-between items-start
+          border border-[rgba(0,0,0,0.02)]
+        ">
+          {/* Left panel: Info */}
+          <div className="w-full lg:w-[228px] h-auto lg:h-[88px] flex flex-col justify-start items-start p-[20px] gap-[16px]">
+            <div className="flex flex-col gap-[10px] w-full lg:w-[188px]">
+              <h2 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Personal information
+              </h2>
+              <p className="font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77] m-0">
+                Manage your bio data
+              </p>
+            </div>
+          </div>
+
+          {/* Right panel: Inputs Card */}
+          <div className="
+            w-full lg:w-[580px]
+            min-h-[274px] lg:h-[274px]
+            bg-white rounded-[6px]
+            p-[20px]
+            flex flex-col gap-[24px]
+            border border-[rgba(0,0,0,0.03)]
+          ">
+            {/* Avatar upload */}
+            <div className="flex flex-row items-center gap-[16px] h-[64px]">
+              <div className="relative w-[64px] h-[64px] rounded-full overflow-hidden bg-[#F4F4F5] border border-[rgba(39,39,42,0.1)] flex items-center justify-center">
+                <span className="text-[16px] font-bold text-gray-500">SA</span>
+              </div>
+              <div className="flex flex-col items-start gap-[4px]">
+                <button className="h-[28px] px-[12px] py-[4px] bg-white border border-[rgba(39,39,42,0.15)] rounded-[6px] text-[12px] font-medium text-[#111115] hover:bg-gray-50 transition-colors cursor-pointer">
+                  Upload
+                </button>
+                <p className="font-normal text-[11px] leading-[16px] text-[#6F6F77] m-0">
+                  JPG, GIF or PNG. 1MB Max.
+                </p>
+              </div>
+            </div>
+
+            {/* Inputs: First Name & Last Name */}
+            <div className="flex flex-col sm:flex-row gap-[16px] w-full">
+              <div className="flex flex-col gap-[8px] w-full sm:w-[262px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  First name
+                </label>
+                <input
+                  type="text"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  className="w-full h-[36px] px-[12px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] focus:outline-none focus:ring-1 focus:ring-[#2F54D8] focus:border-[#2F54D8] transition-all"
+                />
+              </div>
+              <div className="flex flex-col gap-[8px] w-[262px] h-[64px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  className="w-full h-[36px] px-[12px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] focus:outline-none focus:ring-1 focus:ring-[#2F54D8] focus:border-[#2F54D8] transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Inputs: Phone & Country */}
+            <div className="flex flex-col sm:flex-row gap-[16px] w-full">
+              <div className="flex flex-col gap-[8px] w-full sm:w-[262px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  Phone number
+                </label>
+                <div className="flex flex-row gap-[8px] w-full h-[36px]">
+                  <div className="relative">
+                    <select className="h-[36px] pl-[10px] pr-[24px] py-[8px] bg-[rgba(39,39,42,0.06)] border-none rounded-[8px] text-[14px] leading-[20px] text-[#111115] font-medium appearance-none cursor-pointer focus:outline-none">
+                      <option>+237</option>
+                      <option>+1</option>
+                      <option>+33</option>
+                    </select>
+                    <svg className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[12px] h-[12px] text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    className="flex-1 h-[36px] px-[12px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] focus:outline-none focus:ring-1 focus:ring-[#2F54D8] focus:border-[#2F54D8] transition-all"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-[8px] w-[262px] h-[64px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  Country
+                </label>
+                <div className="relative w-full h-[36px]">
+                  <select
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    className="w-full h-[36px] pl-[34px] pr-[30px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2F54D8]"
+                  >
+                    <option value="Cameroon">Cameroon</option>
+                    <option value="Nigeria">Nigeria</option>
+                    <option value="Ghana">Ghana</option>
+                  </select>
+                  <span className="absolute left-[12px] top-1/2 -translate-y-1/2 text-[14px] pointer-events-none">
+                    {formData.country === 'Cameroon' ? '🇨🇲' : formData.country === 'Nigeria' ? '🇳🇬' : '🇬🇭'}
+                  </span>
+                  <svg className="absolute right-[12px] top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
               </div>
-              <span className="text-sm font-semibold text-gray-900">Simon Alt</span>
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-              </svg>
-            </button>
+            </div>
           </div>
-        </div>
-        
-        {/* Row 2: Description and Search Settings */}
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm text-gray-500 font-normal">
-            Manage your account, preferences, and security all in one place.
-          </p>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for settings"
-              className="pl-3 pr-10 py-1.5 w-64 border border-gray-200 rounded-lg text-sm bg-gray-50 hover:bg-gray-100/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-            <svg className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+        </section>
+
+        {/* Preferences Card (height 486px) */}
+        <section className="w-[842px] h-[486px] bg-[#FAFAFA] rounded-[16px] p-[10px] gap-[15px] flex flex-row justify-between items-start border border-[rgba(0,0,0,0.02)]">
+          {/* Left panel: Info */}
+          <div className="w-[228px] h-[88px] flex flex-col justify-start items-start p-[20px] gap-[16px]">
+            <div className="flex flex-col gap-[10px] w-[188px] h-[48px]">
+              <h2 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Preferences
+              </h2>
+              <p className="font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77] m-0">
+                Make it yours
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Row 3: Tabs */}
-        <div className="flex gap-6 border-b border-gray-200">
-          <button className="pb-3 px-1 border-b-2 border-blue-600 text-blue-600 font-semibold text-sm">
-            General settings
-          </button>
-          <button className="pb-3 px-1 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer">
-            Organization
-          </button>
-          <button className="pb-3 px-1 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer">
-            Payment methods
-          </button>
-          <button className="pb-3 px-1 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer">
-            Security
-          </button>
-          <button className="pb-3 px-1 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer">
-            Role & Permission
-          </button>
-          <button className="pb-3 px-1 text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors cursor-pointer">
-            Billing & subcription
-          </button>
-        </div>
-      </header>
-
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto bg-white">
-        <div className="px-8 py-6">
-
-          <div className="grid grid-cols-4 gap-8">
-            {/* Main Content */}
-            <div className="col-span-3 space-y-6">
-              {/* Save your updates banner */}
-              {isDirty && (
-                <div className="bg-white border border-gray-200 border-l-4 border-l-blue-600 rounded-xl p-4 flex items-center justify-between shadow-sm">
-                  <span className="text-base font-bold text-gray-900">Save your updates</span>
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={handleCancel}
-                      className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      onClick={handleSave}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-                    >
-                      Save changes
-                    </button>
-                  </div>
+          {/* Right panel: Two White Cards container */}
+          <div className="w-[580px] h-[466px] flex flex-col gap-[10px]">
+            {/* Card 1: Language */}
+            <div className="w-[580px] h-[152px] bg-white rounded-[6px] p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
+              <h3 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Language
+              </h3>
+              <div className="flex flex-col gap-[8px] w-[540px] h-[64px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  Language
+                </label>
+                <div className="relative w-full h-[36px]">
+                  <select
+                    value={formData.language}
+                    onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                    className="w-full h-[36px] pl-[34px] pr-[30px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2F54D8]"
+                  >
+                    <option value="English">English</option>
+                    <option value="Français">Français</option>
+                    <option value="Español">Español</option>
+                  </select>
+                  <span className="absolute left-[12px] top-1/2 -translate-y-1/2 text-[14px] pointer-events-none">
+                    {formData.language === 'English' ? '🇬🇧' : formData.language === 'Français' ? '🇫🇷' : '🇪🇸'}
+                  </span>
+                  <svg className="absolute right-[12px] top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-              )}
-
-              {/* Personal Information Card */}
-              <section className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="flex gap-8">
-                  {/* Left: Title */}
-                  <div className="w-36 flex-shrink-0">
-                    <h2 className="text-base font-semibold text-gray-900 mb-1">Personal information</h2>
-                    <p className="text-sm text-gray-500 mb-4">Manage your bio data</p>
-                    <div className="border-b border-gray-100 w-full"></div>
-                  </div>
-
-                  {/* Right: Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start gap-6 mb-6">
-                      <div className="relative">
-                        <Avatar src="/avatar.png" alt="Simon Alt" size="lg" fallback="SA" />
-                        <button className="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm hover:bg-blue-700 transition-colors">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="flex-1">
-                        <Button variant="outline" size="sm" className="mb-2">
-                          Upload
-                        </Button>
-                        <p className="text-xs text-gray-500">
-                          JPG, GIF or PNG. 1MB Max.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First name
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.firstName}
-                          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                          className="w-full px-3 py-2.5 border-none rounded-lg text-sm bg-[#F1F5F9] text-gray-900 font-medium focus:ring-1 focus:ring-gray-400 focus:outline-none transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Last name
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.lastName}
-                          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 font-medium focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Phone number
-                        </label>
-                        <div className="flex gap-2">
-                          <div className="relative flex-shrink-0">
-                            <select className="w-24 pl-3 pr-8 py-2.5 border-none rounded-lg text-sm bg-[#F1F5F9] text-gray-900 font-medium focus:ring-1 focus:ring-gray-400 focus:outline-none appearance-none transition-all cursor-pointer">
-                              <option>+237</option>
-                              <option>+1</option>
-                              <option>+33</option>
-                            </select>
-                            <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                          <input
-                            type="text"
-                            value={formData.phoneNumber}
-                            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                            className="flex-1 px-3 py-2.5 border-none rounded-lg text-sm bg-[#F1F5F9] text-gray-900 font-medium focus:ring-1 focus:ring-gray-400 focus:outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Country
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={formData.country}
-                            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                            className="w-full pl-10 pr-8 py-2.5 border-none rounded-lg text-sm bg-[#F1F5F9] text-gray-900 font-medium focus:ring-1 focus:ring-gray-400 focus:outline-none appearance-none transition-all cursor-pointer"
-                          >
-                            <option>Cameroon</option>
-                            <option>Nigeria</option>
-                            <option>Ghana</option>
-                          </select>
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-base">
-                            🇨🇲
-                          </div>
-                          <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Preferences Card */}
-              <section className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="flex gap-8">
-                  {/* Left: Title */}
-                  <div className="w-36 flex-shrink-0">
-                    <h2 className="text-base font-semibold text-gray-900 mb-1">Preferences</h2>
-                    <p className="text-sm text-gray-500 mb-4">Make it yours</p>
-                    <div className="border-b border-gray-100 w-full"></div>
-                  </div>
-
-                  {/* Right: Content */}
-                  <div className="flex-1 space-y-6">
-                    {/* Language */}
-                    <div>
-                      <h3 className="font-medium text-gray-900 mb-2">Language</h3>
-                      <p className="text-sm text-gray-500 mb-3">Select a default language</p>
-                      <div className="relative">
-                        <select
-                          value={formData.language}
-                          onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                          className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-900 font-medium focus:bg-white focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none appearance-none transition-all"
-                        >
-                          <option>English</option>
-                          <option>Français</option>
-                          <option>Español</option>
-                        </select>
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-base">
-                          🇬🇧
-                        </div>
-                        <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Timezone */}
-                    <div>
-                      <h3 className="font-medium text-gray-900 mb-2">Timezone</h3>
-                      <p className="text-sm text-gray-500 mb-3">Edit your timezone</p>
-                      <select
-                        value={formData.timezone}
-                        onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-900 font-medium focus:bg-white focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none appearance-none transition-all"
-                      >
-                        <option>UTC-08:00 Pacific Time, US & Canada</option>
-                        <option>GMT+1</option>
-                        <option>GMT+0</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              </div>
             </div>
 
-            {/* Right Sidebar */}
-            <div className="col-span-1">
-              <section className="bg-[#F8FAFC] border border-gray-200/80 rounded-2xl p-6 sticky top-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-1">Help & Support</h2>
-                <p className="text-sm text-gray-500 mb-4">Get answer or contact support</p>
-
-                <div className="space-y-2">
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 bg-white rounded-lg shadow-sm hover:shadow transition-all text-left group cursor-pointer">
-                    <svg className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-sm text-gray-700 font-medium group-hover:text-gray-900 transition-colors">FAQs</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 bg-white rounded-lg shadow-sm hover:shadow transition-all text-left group cursor-pointer">
-                    <svg className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0 10v-6m-6 6v-8m0 8a2 2 0 100-4m0 4a2 2 0 110-4m0-6V4m12 12v-2m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0-12v-2" />
-                    </svg>
-                    <span className="text-sm text-gray-700 font-medium group-hover:text-gray-900 transition-colors">Help Center</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-blue-50 rounded-lg transition-colors text-left group cursor-pointer">
-                    <svg className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 18v-6a9 9 0 0118 0v6M3 18a3 3 0 003-3h1a3 3 0 003-3v-3a3 3 0 00-3-3H3m18 9a3 3 0 01-3 3h-1a3 3 0 01-3-3v-3a3 3 0 013-3h3" />
-                    </svg>
-                    <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700 transition-colors">Contact support</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-blue-50 rounded-lg transition-colors text-left group cursor-pointer">
-                    <svg className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700 transition-colors">Open a Ticket</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-blue-50 rounded-lg transition-colors text-left group cursor-pointer">
-                    <svg className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                    <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700 transition-colors">Suggest a feature</span>
-                  </button>
+            {/* Card 2: Timezone */}
+            <div className="w-[580px] h-[152px] bg-white rounded-[6px] p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
+              <h3 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Timezone
+              </h3>
+              <div className="flex flex-col gap-[8px] w-[540px] h-[64px]">
+                <label className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#717171]">
+                  Timezone
+                </label>
+                <div className="relative w-full h-[36px]">
+                  <select
+                    value={formData.timezone}
+                    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                    className="w-full h-[36px] pl-[12px] pr-[30px] py-[8px] bg-[rgba(39,39,42,0.06)] border border-transparent rounded-[8px] text-[14px] leading-[20px] text-[#111115] appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2F54D8]"
+                  >
+                    <option value="UTC-08:00 Pacific Time, US & Canada">UTC-08:00 Pacific Time, US & Canada</option>
+                    <option value="GMT+1">GMT+1 (West Africa Time)</option>
+                    <option value="GMT+0">GMT+0 (Greenwich Mean Time)</option>
+                  </select>
+                  <svg className="absolute right-[12px] top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-              </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Notifications Card (height 750px) */}
+        <section className="w-[842px] h-[750px] bg-[#FAFAFA] rounded-[16px] p-[10px] gap-[15px] flex flex-row justify-between items-start border border-[rgba(0,0,0,0.02)]">
+          {/* Left panel: Info */}
+          <div className="w-[228px] h-[88px] flex flex-col justify-start items-start p-[20px] gap-[16px]">
+            <div className="flex flex-col gap-[10px] w-[188px] h-[48px]">
+              <h2 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Notifications
+              </h2>
+              <p className="font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77] m-0">
+                Setup your notifications preferences
+              </p>
+            </div>
+          </div>
+
+          {/* Right panel: Channels & Settings stack */}
+          <div className="w-[580px] h-[730px] flex flex-col gap-[10px]">
+            {/* Card 1: Notifications channels */}
+            <div className="w-[580px] h-[256px] bg-white rounded-[6px] p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
+              <h3 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Notifications channels
+              </h3>
+              <div className="flex flex-col gap-[10px] w-[540px] h-[168px]">
+                {/* Channel: Email */}
+                <div className="w-[540px] h-[52px] bg-white border border-[rgba(0,0,0,0.05)] rounded-[8px] flex flex-row justify-between items-center p-[10px] gap-[10px]">
+                  <div className="flex flex-row items-center gap-[10px]">
+                    {/* Envelope Icon */}
+                    <svg className="w-[24px] h-[24px] text-[#464646]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span className="font-medium text-[14px] leading-[20px] text-[#111115]">
+                      Email
+                    </span>
+                  </div>
+                  <Switch
+                    checked={notifications.email}
+                    onChange={(val) => setNotifications(prev => ({ ...prev, email: val }))}
+                  />
+                </div>
+
+                {/* Channel: SMS */}
+                <div className="w-[540px] h-[52px] bg-white border border-[rgba(0,0,0,0.05)] rounded-[8px] flex flex-row justify-between items-center p-[10px] gap-[10px]">
+                  <div className="flex flex-row items-center gap-[10px]">
+                    {/* Chat Icon */}
+                    <svg className="w-[24px] h-[24px] text-[#464646]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span className="font-medium text-[14px] leading-[20px] text-[#111115]">
+                      SMS
+                    </span>
+                  </div>
+                  <Switch
+                    checked={notifications.sms}
+                    onChange={(val) => setNotifications(prev => ({ ...prev, sms: val }))}
+                  />
+                </div>
+
+                {/* Channel: Push */}
+                <div className="w-[540px] h-[52px] bg-white border border-[rgba(0,0,0,0.05)] rounded-[8px] flex flex-row justify-between items-center p-[10px] gap-[10px]">
+                  <div className="flex flex-row items-center gap-[10px]">
+                    {/* Bell Icon */}
+                    <svg className="w-[24px] h-[24px] text-[#464646]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span className="font-medium text-[14px] leading-[20px] text-[#111115]">
+                      Push
+                    </span>
+                  </div>
+                  <Switch
+                    checked={notifications.push}
+                    onChange={(val) => setNotifications(prev => ({ ...prev, push: val }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Notifications settings (Accordions) */}
+            <div className="w-[580px] h-[464px] bg-white rounded-[6px] p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
+              <h3 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+                Notifications settings
+              </h3>
+              
+              <div className="w-[540px] flex flex-col gap-[10px]">
+                {/* Accordion 1: Security alerts */}
+                <div className="w-[521px] flex flex-col border border-[rgba(0,0,0,0.05)] rounded-[8px] overflow-hidden">
+                  {/* Header Row */}
+                  <div 
+                    onClick={() => toggleAccordion(0)}
+                    className="w-full h-[44px] bg-white px-[10px] py-[6px] flex flex-row justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex flex-row items-center gap-[10px]">
+                      <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                        Security alerts
+                      </span>
+                    </div>
+                    <div className="flex flex-row items-center gap-[10px]">
+                      <Switch
+                        checked={accordionSwitches[0]}
+                        onChange={(val) => setAccordionSwitches(prev => ({ ...prev, 0: val }))}
+                      />
+                      <svg
+                        className={`w-[24px] h-[24px] text-gray-400 transition-transform duration-200 ${openAccordion === 0 ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Expanded Sub-header (Channels checkboxes) */}
+                  {openAccordion === 0 && (
+                    <div className="w-full h-[40px] bg-[#F5F5F5] border-t border-[rgba(0,0,0,0.05)] px-[10px] flex flex-row justify-between items-center">
+                      <span className="text-[14px] leading-[20px] text-[#414141]">
+                        Select your notification channels:
+                      </span>
+                      <div className="flex flex-row items-center gap-[20px]">
+                        {/* SMS Checkbox */}
+                        <div 
+                          onClick={() => setNotifications(prev => ({ ...prev, sms: !prev.sms }))}
+                          className="flex flex-row items-center gap-[8px] cursor-pointer"
+                        >
+                          <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center border transition-colors ${
+                            notifications.sms 
+                              ? 'bg-[#F9F5FF] border-[#2F54D8]' 
+                              : 'bg-white border-gray-300'
+                          }`}>
+                            {notifications.sms && (
+                              <svg className="w-[10px] h-[10px] text-[#2F54D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                            SMS
+                          </span>
+                        </div>
+
+                        {/* Email Checkbox */}
+                        <div 
+                          onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
+                          className="flex flex-row items-center gap-[8px] cursor-pointer"
+                        >
+                          <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center border transition-colors ${
+                            notifications.email 
+                              ? 'bg-[#F9F5FF] border-[#2F54D8]' 
+                              : 'bg-white border-gray-300'
+                          }`}>
+                            {notifications.email && (
+                              <svg className="w-[10px] h-[10px] text-[#2F54D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                            Email
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Expanded Details list (Toggles) */}
+                  {openAccordion === 0 && (
+                    <div className="w-full bg-white border-t border-[rgba(0,0,0,0.05)] p-[10px] flex flex-col gap-[10px]">
+                      {/* Sub-notification: Receive news and updates */}
+                      <div className="flex flex-row justify-between items-center h-[20px]">
+                        <span className="text-[14px] leading-[20px] text-[#767676]">
+                          Receive news and updates
+                        </span>
+                        <Switch
+                          checked={subNotifications.newsAndUpdates}
+                          onChange={(val) => setSubNotifications(prev => ({ ...prev, newsAndUpdates: val }))}
+                        />
+                      </div>
+
+                      {/* Sub-notification: Secure account alerts */}
+                      <div className="flex flex-row justify-between items-center h-[20px]">
+                        <span className="text-[14px] leading-[20px] text-[#767676]">
+                          Secure account alerts
+                        </span>
+                        <Switch
+                          checked={subNotifications.secureAlerts}
+                          onChange={(val) => setSubNotifications(prev => ({ ...prev, secureAlerts: val }))}
+                        />
+                      </div>
+
+                      {/* Sub-notification: Get notified login device */}
+                      <div className="flex flex-row justify-between items-center h-[20px]">
+                        <span className="text-[14px] leading-[20px] text-[#767676]">
+                          Get notified when someone logs in from a new device
+                        </span>
+                        <Switch
+                          checked={subNotifications.newDeviceLogin}
+                          onChange={(val) => setSubNotifications(prev => ({ ...prev, newDeviceLogin: val }))}
+                        />
+                      </div>
+
+                      {/* Sub-notification: Billing and invoice */}
+                      <div className="flex flex-row justify-between items-center h-[20px]">
+                        <span className="text-[14px] leading-[20px] text-[#767676]">
+                          Billing and invoice
+                        </span>
+                        <Switch
+                          checked={subNotifications.billingAndInvoice}
+                          onChange={(val) => setSubNotifications(prev => ({ ...prev, billingAndInvoice: val }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Accordion 2: Billing (Collapsed) */}
+                <div className="w-[521px] flex flex-col border border-[rgba(0,0,0,0.05)] rounded-[8px] overflow-hidden">
+                  <div 
+                    onClick={() => toggleAccordion(1)}
+                    className="w-full h-[44px] bg-white px-[10px] py-[6px] flex flex-row justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                      Billing
+                    </span>
+                    <div className="flex flex-row items-center gap-[10px]">
+                      <Switch
+                        checked={accordionSwitches[1]}
+                        onChange={(val) => setAccordionSwitches(prev => ({ ...prev, 1: val }))}
+                      />
+                      <svg
+                        className={`w-[24px] h-[24px] text-gray-400 transition-transform duration-200 ${openAccordion === 1 ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {openAccordion === 1 && (
+                    <div className="w-full bg-white border-t border-[rgba(0,0,0,0.05)] p-[10px] text-[13px] text-gray-500">
+                      Configure your billing notifications and receipt schedules.
+                    </div>
+                  )}
+                </div>
+
+                {/* Accordion 3: Marketing (Collapsed) */}
+                <div className="w-[521px] flex flex-col border border-[rgba(0,0,0,0.05)] rounded-[8px] overflow-hidden">
+                  <div 
+                    onClick={() => toggleAccordion(2)}
+                    className="w-full h-[44px] bg-white px-[10px] py-[6px] flex flex-row justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                      Marketing
+                    </span>
+                    <div className="flex flex-row items-center gap-[10px]">
+                      <Switch
+                        checked={accordionSwitches[2]}
+                        onChange={(val) => setAccordionSwitches(prev => ({ ...prev, 2: val }))}
+                      />
+                      <svg
+                        className={`w-[24px] h-[24px] text-gray-400 transition-transform duration-200 ${openAccordion === 2 ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {openAccordion === 2 && (
+                    <div className="w-full bg-white border-t border-[rgba(0,0,0,0.05)] p-[10px] text-[13px] text-gray-500">
+                      Configure your promotion, offer, and newsletter subscriptions.
+                    </div>
+                  )}
+                </div>
+
+                {/* Accordion 4: Advanced settings (Collapsed) */}
+                <div className="w-[521px] flex flex-col border border-[rgba(0,0,0,0.05)] rounded-[8px] overflow-hidden">
+                  <div 
+                    onClick={() => toggleAccordion(3)}
+                    className="w-full h-[44px] bg-white px-[10px] py-[6px] flex flex-row justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="font-medium text-[14px] leading-[20px] text-[#414651]">
+                      Advanced settings
+                    </span>
+                    <div className="flex flex-row items-center gap-[10px]">
+                      <Switch
+                        checked={accordionSwitches[3]}
+                        onChange={(val) => setAccordionSwitches(prev => ({ ...prev, 3: val }))}
+                      />
+                      <svg
+                        className={`w-[24px] h-[24px] text-gray-400 transition-transform duration-200 ${openAccordion === 3 ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {openAccordion === 3 && (
+                    <div className="w-full bg-white border-t border-[rgba(0,0,0,0.05)] p-[10px] text-[13px] text-gray-500">
+                      Configure developer API alerts, webhook triggers, and log access webhooks.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* 4. Help & Support Card (Right Sidebar) - Hidden on mobile, visible on desktop */}
+      <div className={`
+        hidden lg:block
+        absolute 
+        w-[311px] 
+        h-[320px] 
+        left-[873px] 
+        top-[174px] 
+        bg-[#FAFAFA] 
+        rounded-[16px] 
+        p-[20px] 
+        border border-[rgba(0,0,0,0.02)]
+        ${activeTab === 'General settings' ? 'lg:block' : 'lg:hidden'}
+      `}>
+        {/* Frame 125 - Content Container */}
+        <div className="flex flex-col gap-[16px] w-[271px] h-[280px]">
+          {/* Text - Title + Description */}
+          <div className="flex flex-col gap-[10px] w-[271px] h-[48px]">
+            <h2 className="font-medium text-[18px] leading-[24px] tracking-[-0.01em] text-[#0E121B] m-0">
+              Help & Support
+            </h2>
+            <p className="font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77] m-0">
+              Get answer or contact support
+            </p>
+          </div>
+
+          {/* Frame 1000005258 - Support items stack */}
+          <div className="flex flex-col justify-center items-start gap-[8px] w-[271px] h-[216px]">
+            {/* FAQs Button (Height 44px, White Card) */}
+            <button className="flex flex-row items-center px-[8px] py-[10px] gap-[8px] w-[271px] h-[44px] bg-white border border-[rgba(0,0,0,0.03)] rounded-[8px] cursor-pointer hover:bg-gray-50 hover:shadow-sm transition-all text-left">
+              <svg className="w-[24px] h-[24px] text-[#464646]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-normal text-[16px] leading-[24px] text-[#464646] tracking-[-0.02em]">
+                FAQs
+              </span>
+            </button>
+
+            {/* Help Center Button (Height 44px, White Card) */}
+            <button className="flex flex-row items-center px-[8px] py-[10px] gap-[8px] w-[271px] h-[44px] bg-white border border-[rgba(0,0,0,0.03)] rounded-[8px] cursor-pointer hover:bg-gray-50 hover:shadow-sm transition-all text-left">
+              <svg className="w-[24px] h-[24px] text-[#464646]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0 10v-6m-6 6v-8m0 8a2 2 0 100-4m0 4a2 2 0 110-4m0-6V4m12 12v-2m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0-12v-2" />
+              </svg>
+              <span className="font-normal text-[16px] leading-[24px] text-[#464646] tracking-[-0.02em]">
+                Help Center
+              </span>
+            </button>
+
+            {/* Frame 1000005259 - Transparent Action items container */}
+            <div className="flex flex-col gap-[5px] w-[271px] h-[112px]">
+              {/* Contact Support - Height 34px */}
+              <button className="flex flex-row items-center px-[8px] py-[5px] gap-[8px] w-[271px] h-[34px] rounded-[8px] cursor-pointer hover:bg-[#2F54D8]/5 transition-colors text-left">
+                <svg className="w-[24px] h-[24px] text-[#2F54D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span className="font-normal text-[14px] leading-[20px] tracking-[-0.02em] text-[#2F54D8]">
+                  Contact support
+                </span>
+              </button>
+
+              {/* Open a Ticket - Height 34px */}
+              <button className="flex flex-row items-center px-[8px] py-[5px] gap-[8px] w-[271px] h-[34px] rounded-[8px] cursor-pointer hover:bg-[#2F54D8]/5 transition-colors text-left">
+                <svg className="w-[24px] h-[24px] text-[#2F54D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="font-normal text-[14px] leading-[20px] tracking-[-0.02em] text-[#2F54D8]">
+                  Open a ticket
+                </span>
+              </button>
+
+              {/* Suggest a feature - Height 34px */}
+              <button className="flex flex-row items-center px-[8px] py-[5px] gap-[8px] w-[271px] h-[34px] rounded-[8px] cursor-pointer hover:bg-[#2F54D8]/5 transition-colors text-left">
+                <svg className="w-[24px] h-[24px] text-[#2F54D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <span className="font-normal text-[14px] leading-[20px] tracking-[-0.02em] text-[#2F54D8]">
+                  Suggest a feature
+                </span>
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </>
+      {activeTab === 'Organization' && <OrganizationContent />}
+
+      </div>
+
+      {/* 5. Floating Save Banner */}
+      {activeTab === 'General settings' && isDirty && (
+        <div className="fixed bottom-[24px] left-[257px] w-[842px] bg-white border border-gray-200 border-l-[4px] border-l-[#2F54D8] rounded-[12px] p-[16px] flex flex-row items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.08)] z-[100] transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+          <span className="text-[16px] font-bold text-[#111115]">
+            Save your updates
+          </span>
+          <div className="flex items-center gap-[12px]">
+            <button
+              onClick={handleCancel}
+              className="px-[16px] py-[8px] bg-white border border-gray-300 rounded-[8px] text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-[16px] py-[8px] bg-[#2F54D8] hover:bg-[#2F54D8]/95 text-white rounded-[8px] text-[14px] font-semibold transition-colors cursor-pointer shadow-sm"
+            >
+              Save changes
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OrganizationContent() {
+  const menuItems = [
+    { label: 'Organization information', icon: Building2, active: true },
+    { label: 'KYC/KYB Verification', icon: FileBadge },
+    { label: 'Billing & Plan', icon: CreditCard },
+    { label: 'Subscription', icon: Users },
+  ];
+
+  return (
+    <div className="
+      relative lg:absolute
+      w-full lg:w-[calc(100%_-_42px)]
+      min-h-[1114px] lg:min-h-0 lg:h-[calc(100vh-192px)]
+      left-0 lg:left-[21px]
+      top-0 lg:top-[174px]
+      flex flex-col lg:flex-row
+      items-start
+      gap-[10px]
+      py-6 lg:py-0
+      pb-16 lg:pb-0
+      lg:overflow-visible
+    ">
+      <div className="
+        w-full lg:w-[891px]
+        lg:h-full
+        flex flex-col lg:flex-row
+        items-start
+        gap-[10px]
+        lg:overflow-y-auto
+        lg:overflow-x-hidden
+        lg:scrollbar-hide
+      ">
+        <aside className="
+          w-full lg:w-[256px]
+          min-h-[212px]
+          bg-white
+          border border-[rgba(39,39,42,0.1)]
+          rounded-[16px]
+          p-[10px]
+          flex flex-col
+          gap-[8px]
+          shrink-0
+        ">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                className={`
+                  w-full h-[32px]
+                  flex items-center
+                  gap-[6px]
+                  rounded-[6px]
+                  p-[6px]
+                  text-left
+                  transition-colors
+                  ${item.active ? 'bg-[rgba(101,160,253,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-[rgba(39,39,42,0.06)]'}
+                `}
+              >
+                <Icon className={`h-[20px] w-[20px] ${item.active ? 'text-[#2F54D8]' : 'text-[#A1A1A9]'}`} strokeWidth={1.7} />
+                <span className={`flex-1 px-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] ${item.active ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  {item.label}
+                </span>
+                {item.active && <ChevronDown className="h-[16px] w-[16px] -rotate-90 text-[#2F54D8]" strokeWidth={1.8} />}
+              </button>
+            );
+          })}
+        </aside>
+
+        <div className="w-full lg:w-[625px] flex flex-col gap-[10px]">
+          <section className="
+            w-full lg:w-[625px]
+            min-h-[667px]
+            rounded-[16px]
+            bg-[#FAFAFA]
+            p-[10px]
+            flex flex-col
+            gap-[15px]
+            border border-[rgba(0,0,0,0.02)]
+          ">
+            <div className="flex flex-col gap-[10px] p-[20px] w-full lg:w-[338px]">
+              <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
+                Organization Informations
+              </h2>
+              <p className="m-0 text-[14px] font-normal leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
+                Manage your organization profile informations
+              </p>
+            </div>
+
+            <div className="w-full lg:w-[605px] min-h-[544px] rounded-[6px] bg-white p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
+              <div className="flex items-center gap-[16px]">
+                <div className="relative flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[6px] border border-[rgba(39,39,42,0.1)] bg-gradient-to-b from-[#E4E4E7] to-[#FAFAFA]">
+                  <span className="text-[18px] font-semibold text-[#2F54D8]">A</span>
+                </div>
+                <button className="flex h-[28px] items-center gap-[4px] rounded-[6px] border border-[rgba(39,39,42,0.15)] bg-white px-[8px] text-[14px] font-medium leading-[20px] text-[#111115] shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_-1px_0_rgba(0,0,0,0.08)] hover:bg-gray-50">
+                  <Upload className="h-[14px] w-[14px]" strokeWidth={1.8} />
+                  Upload
+                </button>
+                <p className="m-0 text-[12px] leading-[16px] tracking-[-0.01em] text-[#6F6F77]">
+                  JPG, GIF or PNG. 1MB Max.
+                </p>
+              </div>
+
+              <div className="flex w-full flex-col gap-[40px]">
+                <div className="flex flex-col gap-[20px]">
+                  <OrgInput label="Organization name" required value="Adxens" />
+                  <OrgSelect label="Organization type" required value="Digital finance" />
+                </div>
+
+                <div className="grid w-full grid-cols-1 gap-[16px] sm:grid-cols-2">
+                  <OrgSelect label="Industry" value="Fintech" />
+                  <OrgSelect label="Company size" value="11-50 employees" />
+                  <OrgSelect label="Country" value="Cameroon" />
+                  <OrgInput label="Registration ID" value="ADX-2026-0192" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="
+            w-full lg:w-[625px]
+            min-h-[256px]
+            rounded-[16px]
+            bg-[#FAFAFA]
+            p-[10px]
+            flex flex-col
+            gap-[15px]
+            border border-[rgba(0,0,0,0.02)]
+          ">
+            <div className="flex flex-col gap-[10px] p-[20px]">
+              <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
+                Organization Preferences
+              </h2>
+              <p className="m-0 text-[14px] font-normal leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
+                Configure defaults used across the workspace
+              </p>
+            </div>
+
+            <div className="w-full lg:w-[605px] rounded-[6px] bg-white p-[20px] flex flex-col gap-[20px] border border-[rgba(0,0,0,0.03)]">
+              <OrgSelect label="Default currency" value="XAF - Central African CFA franc" />
+              <OrgSelect label="Workspace language" value="English" />
+              <div className="flex flex-wrap items-center gap-[40px]">
+                {['Finance', 'Marketing', 'Operations'].map((label, index) => (
+                  <label key={label} className="flex h-[20px] items-center gap-[8px] text-[14px] font-medium leading-[20px] text-[#414651]">
+                    <span className={`flex h-[16px] w-[16px] items-center justify-center rounded-[8px] border ${index === 2 ? 'border-[#2F54D8] bg-[#F9F5FF]' : 'border-[#D5D7DA] bg-white'}`}>
+                      {index === 2 && <Check className="h-[10px] w-[10px] text-[#2F54D8]" strokeWidth={2.4} />}
+                    </span>
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div className="
+        hidden lg:flex
+        lg:absolute
+        lg:left-[901px]
+        lg:top-0
+        w-[260px]
+        min-h-[320px]
+        rounded-[16px]
+        bg-[#FAFAFA]
+        p-[20px]
+        flex-col
+        gap-[16px]
+        border border-[rgba(0,0,0,0.02)]
+        shrink-0
+      ">
+        <div className="flex flex-col gap-[10px]">
+          <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
+            Help & Support
+          </h2>
+          <p className="m-0 text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
+            Get answer or contact support
+          </p>
+        </div>
+        <div className="flex flex-col gap-[8px]">
+          {['FAQs', 'Help Center', 'Contact support', 'Open a Ticket', 'Suggest a feature'].map((item, index) => (
+            <button
+              key={item}
+              className={`
+                h-[44px] rounded-[8px] px-[10px] text-left text-[14px] font-medium hover:bg-gray-50
+                ${index < 2 ? 'bg-white text-[#464646]' : 'bg-transparent text-[#2F54D8]'}
+              `}
+              type="button"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrgInput({ label, value, required = false }: { label: string; value: string; required?: boolean }) {
+  return (
+    <label className="flex w-full flex-col gap-[8px]">
+      <span className="flex items-center gap-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] text-[#111115]">
+        {label}
+        {required && <span className="font-semibold text-[#D42422]">*</span>}
+      </span>
+      <input
+        defaultValue={value}
+        className="h-[36px] w-full rounded-[8px] border border-transparent bg-[rgba(39,39,42,0.06)] px-[12px] text-[14px] leading-[20px] text-[#111115] outline-none transition-all focus:border-[#2F54D8] focus:ring-1 focus:ring-[#2F54D8]"
+      />
+    </label>
+  );
+}
+
+function OrgSelect({ label, value, required = false }: { label: string; value: string; required?: boolean }) {
+  return (
+    <label className="flex w-full flex-col gap-[8px]">
+      <span className="flex items-center gap-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] text-[#111115]">
+        {label}
+        {required && <span className="font-semibold text-[#D42422]">*</span>}
+      </span>
+      <span className="relative block h-[36px] w-full">
+        <select
+          defaultValue={value}
+          className="h-[36px] w-full appearance-none rounded-[8px] border border-transparent bg-[rgba(39,39,42,0.06)] px-[12px] pr-[36px] text-[14px] leading-[20px] text-[#111115] outline-none transition-all focus:border-[#2F54D8] focus:ring-1 focus:ring-[#2F54D8]"
+        >
+          <option>{value}</option>
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-[12px] top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-[#A1A1A9]" strokeWidth={1.8} />
+      </span>
+    </label>
   );
 }

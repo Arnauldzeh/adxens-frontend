@@ -1,126 +1,248 @@
 'use client';
 
-import React from 'react';
-import { useOrganization } from '@/hooks/useOrganization';
+import { useState } from 'react';
+import { Home, CreditCard, Wallet, Settings, ChevronRight, X } from 'lucide-react';
 
-interface SidebarItem {
-  icon: React.ReactNode;
-  label: string;
-  badge?: number;
-  active?: boolean;
-  hasSubmenu?: boolean;
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function Sidebar() {
-  const { organization } = useOrganization();
-
-  const items: SidebarItem[] = [
-    { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>,
-      label: 'Home' 
-    },
-    { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M11 5.882a5.008 5.008 0 014.288 4.118L18 10v3l-2.712.5a5.008 5.008 0 01-4.288 4.118" /></svg>,
-      label: 'Ad accounts', 
-      badge: 2,
-      hasSubmenu: true
-    },
-    { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
-      label: 'Wallet',
-      hasSubmenu: true
-    },
-    { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
-      label: 'Teams',
-      hasSubmenu: true 
-    },
-    { 
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>,
-      label: 'Affiliate program' 
-    }
-  ];
+export function Sidebar({ isOpen = false, onClose = () => {} }: SidebarProps) {
+  const [activeMenu, setActiveMenu] = useState('settings');
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      <div className="p-4">
-        {/* Logo */}
-        <div className="flex items-center gap-2 mb-6">
-          <svg className="w-7 h-7 text-black" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.5 12c1.8-1.2 4-3.5 4-5.5 0-1.8-1.2-3-3-3-1.8 0-3.5 1.8-5 4-1.5-2.2-3.2-4-5-4-1.8 0-3 1.2-3 3 0 2 2.2 4.3 4 5.5-1.8 1.2-4 3.5-4 5.5 0 1.8 1.2 3 3 3 1.8 0 3.5-1.8 5-4 1.5 2.2 3.2 4 5 4 1.8 0 3-1.2 3-3 0-2-2.2-4.3-4-5.5z" />
-          </svg>
-          <span className="text-xl font-bold tracking-tight text-gray-900">adxens</span>
+    <>
+      {/* Overlay (mobile only) */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:absolute
+        w-[280px] sm:w-[236px]
+        h-screen lg:h-[864px]
+        left-0 top-0
+        bg-[#FAFAFA]
+        flex flex-col items-start p-0
+        transition-transform duration-300 ease-in-out
+        z-40 lg:z-auto
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Close button (mobile only) */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 lg:hidden p-2 hover:bg-gray-200 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
+
+        {/* Logo Userbar - z-index: 4 */}
+        <div className="flex flex-row items-center px-[16px] py-[24px] gap-[8px] w-full h-[72px] flex-none order-0 self-stretch z-[4]">
+          <div className="w-[110px] h-[24px] flex items-center justify-start">
+            <span className="font-bold text-[18px] tracking-tight text-[#131314]">ADXENS</span>
+          </div>
         </div>
 
-        {/* Workspace Selector */}
-        <div className="mb-6">
-          <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full border-2 border-white"></div>
-              </div>
-              <span className="text-sm font-semibold text-gray-900">Workspace name</span>
+        {/* User Profile Bar - z-index: 3 */}
+        <div className="flex flex-row items-center px-[12px] py-[22px] gap-[12px] w-full h-[68px] bg-[rgba(39,39,42,0.0001)] border-b border-[rgba(39,39,42,0.1)] flex-none order-1 z-[3]">
+          <div className="flex flex-row justify-center items-center w-[24px] h-[24px]">
+            <div className="relative w-[24px] h-[24px] rounded-[6px] bg-[#F4F4F5] border border-[rgba(39,39,42,0.1)] overflow-hidden flex items-center justify-center">
+              <img 
+                src="/avatar.png" 
+                alt="Simon Alt" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <span className="hidden text-[10px] font-bold text-gray-500">SA</span>
             </div>
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-            </svg>
-          </button>
+          </div>
+
+          <span className="flex-1 font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#111115]">
+            Simon Alt
+          </span>
+
+          <div className="flex flex-row justify-center items-center w-[20px] h-[20px]">
+            <ChevronRight className="w-4 h-4 text-[#A1A1A9] rotate-90" />
+          </div>
         </div>
 
-        {/* Search */}
-        <div className="relative mb-6">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full pl-3 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <kbd className="absolute right-3 top-2.5 text-xs text-gray-400 font-mono bg-white border border-gray-200 rounded px-1.5 py-0.5">
-            /
-          </kbd>
-        </div>
+        {/* Menu Container - z-index: 2, flex-grow: 1 */}
+        <div className="flex flex-col items-start p-[12px] gap-[20px] w-full flex-1 order-2 z-[2] overflow-y-auto">
+          {/* Search Input */}
+          <div className="flex flex-col items-start gap-[8px] w-full h-[32px] px-2 sm:px-0">
+            <div className="flex flex-row justify-center items-center w-full h-[32px] bg-[rgba(39,39,42,0.06)] rounded-[8px]">
+              <div className="flex flex-row justify-center items-center px-[8px] py-[6px] gap-[6px] w-full h-[32px]">
+                <div className="flex flex-row items-center gap-[2px] flex-1 h-[20px]">
+                  <div className="flex flex-row items-center px-[4px] flex-1 h-[20px]">
+                    <span className="font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
+                      Search
+                    </span>
+                  </div>
+                  <div className="flex flex-row justify-center items-center px-[4px] w-[20px] min-w-[20px] h-[20px] border border-[rgba(39,39,42,0.1)] rounded-[4px]">
+                    <span className="font-medium text-[12px] leading-[16px] tracking-[-0.01em] text-[#6F6F77]">
+                      /
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Navigation Items */}
-        <nav className="space-y-1">
-          {items.map((item, index) => (
+          {/* Menu Items */}
+          <div className="flex flex-col items-start gap-[2px] w-full px-2 sm:px-0">
+            {/* Home */}
             <button
-              key={index}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                item.active
-                  ? 'bg-gray-100 text-gray-900 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+              onClick={() => {
+                setActiveMenu('home');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'home' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-gray-500">{item.icon}</span>
-                <span>{item.label}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {item.badge && (
-                  <span className="bg-blue-600 text-white text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center">
-                    {item.badge}
-                  </span>
-                )}
-                {item.hasSubmenu && (
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                )}
+              <div className="flex flex-row items-center gap-[6px]">
+                <Home className={`w-5 h-5 ${activeMenu === 'home' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} strokeWidth={1.5} />
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'home' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Home
+                </span>
               </div>
             </button>
-          ))}
-        </nav>
-      </div>
 
-      {/* Bottom Plan Card */}
-      <div className="mt-auto p-4">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-          <p className="text-xs text-gray-600 mb-1">You're currently on the</p>
-          <p className="text-sm font-semibold text-gray-900 mb-2">Starter plan</p>
-          <button className="text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline">
-            Upgrade to
-          </button>
+            {/* Transactions */}
+            <button
+              onClick={() => {
+                setActiveMenu('transactions');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'transactions' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-row items-center gap-[6px]">
+                <CreditCard className={`w-5 h-5 ${activeMenu === 'transactions' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} strokeWidth={1.5} />
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'transactions' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Transactions
+                </span>
+              </div>
+              <div className="flex flex-row items-center gap-[6px]">
+                <div className="flex flex-row justify-center items-center p-[2px] w-[20px] h-[20px] bg-[#2F54D8] border border-[rgba(39,39,42,0.1)] rounded-[9999px]">
+                  <span className="font-medium text-[12px] leading-[16px] tracking-[-0.01em] text-white">
+                    2
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-[#A1A1A9] rotate-90" />
+              </div>
+            </button>
+
+            {/* Wallet */}
+            <button
+              onClick={() => {
+                setActiveMenu('wallet');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'wallet' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-row items-center gap-[6px]">
+                <Wallet className={`w-5 h-5 ${activeMenu === 'wallet' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} strokeWidth={1.5} />
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'wallet' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Wallet
+                </span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#A1A1A9] rotate-90" />
+            </button>
+
+            {/* Cards */}
+            <button
+              onClick={() => {
+                setActiveMenu('cards');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'cards' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-row items-center gap-[6px]">
+                <CreditCard className={`w-5 h-5 ${activeMenu === 'cards' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} strokeWidth={1.5} />
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'cards' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Cards
+                </span>
+              </div>
+            </button>
+
+            {/* Integration */}
+            <button
+              onClick={() => {
+                setActiveMenu('integration');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'integration' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-row items-center gap-[6px]">
+                <svg className={`w-5 h-5 ${activeMenu === 'integration' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'integration' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Integration
+                </span>
+              </div>
+            </button>
+
+            {/* Settings - ACTIVE */}
+            <button
+              onClick={() => {
+                setActiveMenu('settings');
+                onClose();
+              }}
+              className={`flex flex-row justify-between items-center px-[6px] py-[6px] gap-[6px] w-full h-[32px] rounded-[6px] cursor-pointer transition-colors ${
+                activeMenu === 'settings' ? 'bg-[rgba(47,84,216,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex flex-row items-center gap-[6px]">
+                <Settings className={`w-5 h-5 ${activeMenu === 'settings' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`} strokeWidth={1.5} />
+                <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${activeMenu === 'settings' ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
+                  Settings
+                </span>
+              </div>
+              <div className="flex flex-row items-center gap-[6px]">
+                <div className="flex flex-row justify-center items-center p-[2px] w-[18px] h-[20px] bg-[#F8B12D] border border-[rgba(39,39,42,0.1)] rounded-[9999px]">
+                  <span className="font-medium text-[12px] leading-[16px] tracking-[-0.01em] text-white">
+                    !
+                  </span>
+                </div>
+                <ChevronRight className={`w-5 h-5 ${activeMenu === 'settings' ? 'text-[#2F54D8]' : 'text-[#A1A1A9]'}`} />
+              </div>
+            </button>
+          </div>
         </div>
-      </div>
-    </aside>
+
+        {/* Upgrade Card - Bottom */}
+        <div className="hidden lg:flex flex-col items-start p-[12px] gap-[8px] w-full h-[209px] flex-none order-3 self-stretch z-[1]">
+          <div className="relative w-full h-[145px] rounded-[10px]">
+            <div className="absolute w-full h-[142px] left-0 top-0 flex flex-col items-start p-[12px] gap-[10px] border border-[#2F54D8] rounded-[10px] bg-white">
+              <p className="w-full font-normal text-[14px] leading-[20px] tracking-[-0.01em] text-[#575757]">
+                You're currently on the Starter plan. Upgrade to access lower fees, advanced features.
+              </p>
+              <button className="flex flex-row justify-center items-center px-[8px] py-[4px] gap-[4px] w-full h-[28px] bg-white border border-[rgba(39,39,42,0.15)] shadow-[0px_1px_2px_rgba(0,0,0,0.05),inset_0px_-1px_0px_rgba(0,0,0,0.08)] rounded-[6px] cursor-pointer hover:bg-gray-50 transition-colors">
+                <span className="font-medium text-[14px] leading-[20px] tracking-[-0.01em] text-[#111115]">
+                  Upgrade
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

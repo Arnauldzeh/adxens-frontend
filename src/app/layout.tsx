@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/settings/Sidebar";
 
 export const metadata: Metadata = {
   title: "Adxens - Settings",
@@ -14,14 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased overflow-hidden">
-        <div className="flex h-screen bg-gray-50">
-          <Sidebar />
-          <main className="flex-1 flex flex-col overflow-hidden">
-            {children}
-          </main>
-        </div>
-      </body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      </head>
+      <body className="antialiased overflow-hidden">{children}</body>
     </html>
   );
 }
