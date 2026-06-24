@@ -1,19 +1,19 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 type HeaderSectionsProps = {
   activeTab?: string;
-  onTabChange?: (tab: string) => void;
 };
 
-export function HeaderSections({ activeTab = 'General settings', onTabChange }: HeaderSectionsProps) {
+export function HeaderSections({ activeTab = 'General settings' }: HeaderSectionsProps) {
   const tabs = [
-    'General settings',
-    'Organization',
-    'Security',
-    'Terms & Conditions',
-    'About Adxens'
+    { label: 'General settings', href: '/settings' },
+    { label: 'Organization', href: '/settings/organization' },
+    { label: 'Security', href: '/settings/security' },
+    { label: 'Terms & Conditions', href: '/settings/terms' },
+    { label: 'About Adxens', href: '/settings/about' }
   ];
 
   return (
@@ -71,13 +71,12 @@ export function HeaderSections({ activeTab = 'General settings', onTabChange }: 
       ">
         {tabs.map((tab, index) => {
           const widths = ['112px', '88px', '59px', '132px', '97px'];
-          const isActive = activeTab === tab;
+          const isActive = activeTab === tab.label;
           
           return (
-            <button
+            <Link
               key={index}
-              type="button"
-              onClick={() => onTabChange?.(tab)}
+              href={tab.href}
               style={{ width: widths[index] }}
               className={`
                 flex justify-center items-center 
@@ -86,7 +85,6 @@ export function HeaderSections({ activeTab = 'General settings', onTabChange }: 
                 min-h-[48px]
                 bg-[rgba(39,39,42,0.0001)] 
                 rounded-none 
-                cursor-pointer 
                 transition-colors
                 whitespace-nowrap
                 flex-shrink-0
@@ -99,11 +97,11 @@ export function HeaderSections({ activeTab = 'General settings', onTabChange }: 
                   <span className={`font-medium text-[14px] leading-[20px] tracking-[-0.01em] ${
                     isActive ? 'text-[#2F54D8]' : 'text-[#6F6F77]'
                   }`}>
-                    {tab}
+                    {tab.label}
                   </span>
                 </div>
               </div>
-            </button>
+            </Link>
           );
         })}
       </div>

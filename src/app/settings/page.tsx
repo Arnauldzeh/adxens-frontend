@@ -1,24 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Switch } from '@/components/ui/Switch';
 import { Navbar } from '@/components/settings/Navbar';
 import { Sidebar } from '@/components/settings/Sidebar';
 import { HeaderSections } from '@/components/settings/HeaderSections';
-import {
-  Building2,
-  Check,
-  ChevronDown,
-  CreditCard,
-  FileBadge,
-  Upload,
-  Users,
-} from 'lucide-react';
 
 export default function SettingsPage() {
   // Sidebar mobile state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('General settings');
 
   // Original saved data
   const [initialData, setInitialData] = useState({
@@ -103,10 +93,10 @@ export default function SettingsPage() {
         lg:overflow-hidden
       ">
         {/* Header sections: Description & Underline Tabs */}
-        <HeaderSections activeTab={activeTab} onTabChange={setActiveTab} />
+        <HeaderSections activeTab="General settings" />
 
         {/* Main content stack container - Frame 1000005262 */}
-        <div className={`
+        <div className="
           relative lg:absolute
           w-full lg:w-[842px]
           min-h-[1550px] lg:min-h-0 lg:h-[calc(100vh-192px)]
@@ -121,8 +111,7 @@ export default function SettingsPage() {
           lg:overflow-y-auto
           lg:overflow-x-hidden
           lg:scrollbar-hide
-          ${activeTab === 'General settings' ? '' : 'hidden'}
-        `}>
+        ">
         
         {/* Personal Information Card */}
         <section className="
@@ -633,7 +622,7 @@ export default function SettingsPage() {
       </div>
 
       {/* 4. Help & Support Card (Right Sidebar) - Hidden on mobile, visible on desktop */}
-      <div className={`
+      <div className="
         hidden lg:block
         absolute 
         w-[311px] 
@@ -644,8 +633,7 @@ export default function SettingsPage() {
         rounded-[16px] 
         p-[20px] 
         border border-[rgba(0,0,0,0.02)]
-        ${activeTab === 'General settings' ? 'lg:block' : 'lg:hidden'}
-      `}>
+      ">
         {/* Frame 125 - Content Container */}
         <div className="flex flex-col gap-[16px] w-[271px] h-[280px]">
           {/* Text - Title + Description */}
@@ -715,12 +703,11 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-      {activeTab === 'Organization' && <OrganizationContent />}
 
       </div>
 
       {/* 5. Floating Save Banner */}
-      {activeTab === 'General settings' && isDirty && (
+      {isDirty && (
         <div className="fixed bottom-[24px] left-[257px] w-[842px] bg-white border border-gray-200 border-l-[4px] border-l-[#2F54D8] rounded-[12px] p-[16px] flex flex-row items-center justify-between shadow-[0_4px_12px_rgba(0,0,0,0.08)] z-[100] transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
           <span className="text-[16px] font-bold text-[#111115]">
             Save your updates
@@ -742,239 +729,5 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
-  );
-}
-
-function OrganizationContent() {
-  const menuItems = [
-    { label: 'Organization information', icon: Building2, active: true },
-    { label: 'KYC/KYB Verification', icon: FileBadge },
-    { label: 'Billing & Plan', icon: CreditCard },
-    { label: 'Subscription', icon: Users },
-  ];
-
-  return (
-    <div className="
-      relative lg:absolute
-      w-full lg:w-[calc(100%_-_42px)]
-      min-h-[1114px] lg:min-h-0 lg:h-[calc(100vh-192px)]
-      left-0 lg:left-[21px]
-      top-0 lg:top-[174px]
-      flex flex-col lg:flex-row
-      items-start
-      gap-[10px]
-      py-6 lg:py-0
-      pb-16 lg:pb-0
-      lg:overflow-visible
-    ">
-      <div className="
-        w-full lg:w-[891px]
-        lg:h-full
-        flex flex-col lg:flex-row
-        items-start
-        gap-[10px]
-        lg:overflow-y-auto
-        lg:overflow-x-hidden
-        lg:scrollbar-hide
-      ">
-        <aside className="
-          w-full lg:w-[256px]
-          min-h-[212px]
-          bg-white
-          border border-[rgba(39,39,42,0.1)]
-          rounded-[16px]
-          p-[10px]
-          flex flex-col
-          gap-[8px]
-          shrink-0
-        ">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.label}
-                type="button"
-                className={`
-                  w-full h-[32px]
-                  flex items-center
-                  gap-[6px]
-                  rounded-[6px]
-                  p-[6px]
-                  text-left
-                  transition-colors
-                  ${item.active ? 'bg-[rgba(101,160,253,0.1)]' : 'bg-[rgba(39,39,42,0.0001)] hover:bg-[rgba(39,39,42,0.06)]'}
-                `}
-              >
-                <Icon className={`h-[20px] w-[20px] ${item.active ? 'text-[#2F54D8]' : 'text-[#A1A1A9]'}`} strokeWidth={1.7} />
-                <span className={`flex-1 px-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] ${item.active ? 'text-[#2F54D8]' : 'text-[#4E4E55]'}`}>
-                  {item.label}
-                </span>
-                {item.active && <ChevronDown className="h-[16px] w-[16px] -rotate-90 text-[#2F54D8]" strokeWidth={1.8} />}
-              </button>
-            );
-          })}
-        </aside>
-
-        <div className="w-full lg:w-[625px] flex flex-col gap-[10px]">
-          <section className="
-            w-full lg:w-[625px]
-            min-h-[667px]
-            rounded-[16px]
-            bg-[#FAFAFA]
-            p-[10px]
-            flex flex-col
-            gap-[15px]
-            border border-[rgba(0,0,0,0.02)]
-          ">
-            <div className="flex flex-col gap-[10px] p-[20px] w-full lg:w-[338px]">
-              <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
-                Organization Informations
-              </h2>
-              <p className="m-0 text-[14px] font-normal leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
-                Manage your organization profile informations
-              </p>
-            </div>
-
-            <div className="w-full lg:w-[605px] min-h-[544px] rounded-[6px] bg-white p-[20px] flex flex-col gap-[24px] border border-[rgba(0,0,0,0.03)]">
-              <div className="flex items-center gap-[16px]">
-                <div className="relative flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[6px] border border-[rgba(39,39,42,0.1)] bg-gradient-to-b from-[#E4E4E7] to-[#FAFAFA]">
-                  <span className="text-[18px] font-semibold text-[#2F54D8]">A</span>
-                </div>
-                <button className="flex h-[28px] items-center gap-[4px] rounded-[6px] border border-[rgba(39,39,42,0.15)] bg-white px-[8px] text-[14px] font-medium leading-[20px] text-[#111115] shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_-1px_0_rgba(0,0,0,0.08)] hover:bg-gray-50">
-                  <Upload className="h-[14px] w-[14px]" strokeWidth={1.8} />
-                  Upload
-                </button>
-                <p className="m-0 text-[12px] leading-[16px] tracking-[-0.01em] text-[#6F6F77]">
-                  JPG, GIF or PNG. 1MB Max.
-                </p>
-              </div>
-
-              <div className="flex w-full flex-col gap-[40px]">
-                <div className="flex flex-col gap-[20px]">
-                  <OrgInput label="Organization name" required value="Adxens" />
-                  <OrgSelect label="Organization type" required value="Digital finance" />
-                </div>
-
-                <div className="grid w-full grid-cols-1 gap-[16px] sm:grid-cols-2">
-                  <OrgSelect label="Industry" value="Fintech" />
-                  <OrgSelect label="Company size" value="11-50 employees" />
-                  <OrgSelect label="Country" value="Cameroon" />
-                  <OrgInput label="Registration ID" value="ADX-2026-0192" />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="
-            w-full lg:w-[625px]
-            min-h-[256px]
-            rounded-[16px]
-            bg-[#FAFAFA]
-            p-[10px]
-            flex flex-col
-            gap-[15px]
-            border border-[rgba(0,0,0,0.02)]
-          ">
-            <div className="flex flex-col gap-[10px] p-[20px]">
-              <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
-                Organization Preferences
-              </h2>
-              <p className="m-0 text-[14px] font-normal leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
-                Configure defaults used across the workspace
-              </p>
-            </div>
-
-            <div className="w-full lg:w-[605px] rounded-[6px] bg-white p-[20px] flex flex-col gap-[20px] border border-[rgba(0,0,0,0.03)]">
-              <OrgSelect label="Default currency" value="XAF - Central African CFA franc" />
-              <OrgSelect label="Workspace language" value="English" />
-              <div className="flex flex-wrap items-center gap-[40px]">
-                {['Finance', 'Marketing', 'Operations'].map((label, index) => (
-                  <label key={label} className="flex h-[20px] items-center gap-[8px] text-[14px] font-medium leading-[20px] text-[#414651]">
-                    <span className={`flex h-[16px] w-[16px] items-center justify-center rounded-[8px] border ${index === 2 ? 'border-[#2F54D8] bg-[#F9F5FF]' : 'border-[#D5D7DA] bg-white'}`}>
-                      {index === 2 && <Check className="h-[10px] w-[10px] text-[#2F54D8]" strokeWidth={2.4} />}
-                    </span>
-                    {label}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <div className="
-        hidden lg:flex
-        lg:absolute
-        lg:left-[901px]
-        lg:top-0
-        w-[260px]
-        min-h-[320px]
-        rounded-[16px]
-        bg-[#FAFAFA]
-        p-[20px]
-        flex-col
-        gap-[16px]
-        border border-[rgba(0,0,0,0.02)]
-        shrink-0
-      ">
-        <div className="flex flex-col gap-[10px]">
-          <h2 className="m-0 text-[18px] font-medium leading-[24px] tracking-[-0.01em] text-[#0E121B]">
-            Help & Support
-          </h2>
-          <p className="m-0 text-[14px] leading-[20px] tracking-[-0.01em] text-[#6F6F77]">
-            Get answer or contact support
-          </p>
-        </div>
-        <div className="flex flex-col gap-[8px]">
-          {['FAQs', 'Help Center', 'Contact support', 'Open a Ticket', 'Suggest a feature'].map((item, index) => (
-            <button
-              key={item}
-              className={`
-                h-[44px] rounded-[8px] px-[10px] text-left text-[14px] font-medium hover:bg-gray-50
-                ${index < 2 ? 'bg-white text-[#464646]' : 'bg-transparent text-[#2F54D8]'}
-              `}
-              type="button"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OrgInput({ label, value, required = false }: { label: string; value: string; required?: boolean }) {
-  return (
-    <label className="flex w-full flex-col gap-[8px]">
-      <span className="flex items-center gap-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] text-[#111115]">
-        {label}
-        {required && <span className="font-semibold text-[#D42422]">*</span>}
-      </span>
-      <input
-        defaultValue={value}
-        className="h-[36px] w-full rounded-[8px] border border-transparent bg-[rgba(39,39,42,0.06)] px-[12px] text-[14px] leading-[20px] text-[#111115] outline-none transition-all focus:border-[#2F54D8] focus:ring-1 focus:ring-[#2F54D8]"
-      />
-    </label>
-  );
-}
-
-function OrgSelect({ label, value, required = false }: { label: string; value: string; required?: boolean }) {
-  return (
-    <label className="flex w-full flex-col gap-[8px]">
-      <span className="flex items-center gap-[4px] text-[14px] font-medium leading-[20px] tracking-[-0.01em] text-[#111115]">
-        {label}
-        {required && <span className="font-semibold text-[#D42422]">*</span>}
-      </span>
-      <span className="relative block h-[36px] w-full">
-        <select
-          defaultValue={value}
-          className="h-[36px] w-full appearance-none rounded-[8px] border border-transparent bg-[rgba(39,39,42,0.06)] px-[12px] pr-[36px] text-[14px] leading-[20px] text-[#111115] outline-none transition-all focus:border-[#2F54D8] focus:ring-1 focus:ring-[#2F54D8]"
-        >
-          <option>{value}</option>
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-[12px] top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-[#A1A1A9]" strokeWidth={1.8} />
-      </span>
-    </label>
   );
 }

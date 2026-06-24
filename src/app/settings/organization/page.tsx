@@ -20,17 +20,18 @@ export default function OrganizationPage() {
 
       {/* Main Container - Responsive */}
       <div className="
-        relative
-        w-full lg:w-[1204px]
+        relative lg:absolute
+        w-full lg:w-auto
         min-h-screen
-        lg:min-h-[1697px]
-        left-0 lg:left-auto lg:right-0
+        lg:min-h-0 lg:h-[calc(100vh-8px)]
+        left-0 lg:left-[236px] lg:right-0
         top-0 lg:top-[8px]
         mt-[63px] lg:mt-0
         bg-white
         lg:border lg:border-[rgba(39,39,42,0.1)]
         lg:rounded-tl-[16px]
         px-4 sm:px-6 lg:px-0
+        lg:overflow-hidden
       ">
         {/* Header sections: Description & Underline Tabs */}
         <HeaderSections activeTab="Organization" />
@@ -242,8 +243,8 @@ export default function OrganizationPage() {
           absolute 
           w-[311px] 
           h-[320px] 
-          left-[1109px] 
-          top-[192px] 
+          left-[922px] 
+          top-[174px] 
           bg-[#FAFAFA] 
           rounded-[16px] 
           p-[20px] 
